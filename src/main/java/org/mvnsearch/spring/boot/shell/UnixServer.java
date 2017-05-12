@@ -39,27 +39,28 @@ public class UnixServer {
         final File socketFile = new File(path);
         socketFile.deleteOnExit();
 
-        //using PosixFilePermission to set file permissions 660 instead of 666
-        Set<PosixFilePermission> perms = new HashSet<>();
-        //add owners permission
-        perms.add(PosixFilePermission.OWNER_READ);
-        perms.add(PosixFilePermission.OWNER_WRITE);
-        perms.remove(PosixFilePermission.OWNER_EXECUTE);
-        //add group permissions
-        perms.add(PosixFilePermission.GROUP_READ);
-        perms.add(PosixFilePermission.GROUP_WRITE);
-        perms.remove(PosixFilePermission.GROUP_EXECUTE);
-        //add others permissions
-        perms.remove(PosixFilePermission.OTHERS_READ);
-        perms.remove(PosixFilePermission.OTHERS_WRITE);
-        perms.remove(PosixFilePermission.OTHERS_EXECUTE);
-
-        Files.setPosixFilePermissions(Paths.get(path), perms);
-
         final ExecutorService executorService = Executors.newCachedThreadPool();
 
         try (AFUNIXServerSocket server = AFUNIXServerSocket.newInstance()) {
             server.bind(new AFUNIXSocketAddress(socketFile));
+
+            //using PosixFilePermission to set file permissions 660 instead of 666
+            Set<PosixFilePermission> perms = new HashSet<>();
+            //add owners permission
+            perms.add(PosixFilePermission.OWNER_READ);
+            perms.add(PosixFilePermission.OWNER_WRITE);
+            perms.remove(PosixFilePermission.OWNER_EXECUTE);
+            //add group permissions
+            perms.add(PosixFilePermission.GROUP_READ);
+            perms.add(PosixFilePermission.GROUP_WRITE);
+            perms.remove(PosixFilePermission.GROUP_EXECUTE);
+            //add others permissions
+            perms.remove(PosixFilePermission.OTHERS_READ);
+            perms.remove(PosixFilePermission.OTHERS_WRITE);
+            perms.remove(PosixFilePermission.OTHERS_EXECUTE);
+
+            Files.setPosixFilePermissions(Paths.get(path), perms);
+
             System.out.println("server: " + server);
 
             while (!Thread.interrupted()) {
